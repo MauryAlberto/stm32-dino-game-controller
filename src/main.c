@@ -5,7 +5,7 @@ GPIO_PinConf_t UserButton;
 
 void SimDelay(void) {
     uint32_t DelayCount;
-    for(DelayCount = 0; DelayCount < 100000; DelayCount++) {
+    for(DelayCount = 0; DelayCount < 500000; DelayCount++) {
         /* Do nothing */
     }
 }
@@ -41,8 +41,14 @@ int main(void)
 
     while(1)
     {
+        /* Delay for some ms */
         SimDelay();
-        GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
+        /* Turn on the blue LED */
+        GPIO_WritePinBit(GPIOD, GPIO_PIN_NUM_15, GPIO_PIN_HIGH);
+        /* Delay for some ms */
+        SimDelay();
+        /* Turn off the blue LED */
+        GPIO_WritePinBit(GPIOD, GPIO_PIN_NUM_15, GPIO_PIN_LOW);
     }
 
     return 0;

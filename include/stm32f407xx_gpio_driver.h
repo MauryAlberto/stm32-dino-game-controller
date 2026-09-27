@@ -81,5 +81,6 @@ void GPIO_Init(GPIO_RegDef_t* GPIOx, GPIO_PinConf_t GPIOPinConf);
 void GPIO_WritePin(GPIO_RegDef_t* GPIOx, uint8_t PinNumber, GPIO_PinState_e PinState);
 uint8_t GPIO_ReadPin(GPIO_RegDef_t* GPIOx, uint8_t PinNumber);
 void GPIO_TogglePin(GPIO_RegDef_t* GPIOx, uint8_t PinNumber);
+void GPIO_WritePinBit(GPIO_RegDef_t* GPIOx, uint8_t PinNumber, GPIO_PinState_e PinState);
 
 #endif
