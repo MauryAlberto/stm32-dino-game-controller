@@ -1,5 +1,13 @@
 #include "stm32f407xx_gpio_driver.h"
 
+/**
+ * @brief This funtion initializes the GPIO peripheral according to the specified settings.
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param GPIOPinConf Structure that contains the configuration information of a specified GPIO pin.
+ * 
+ * @return None
+ */
 void GPIO_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf)
 {
     /* Configure the pin mode */
@@ -38,6 +46,18 @@ void GPIO_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf)
 
 }
 
+/**
+ * @brief This function writes a high or low state to the specified GPIO pin.
+ *        The value can be [GPIO_PIN_LOW, GPIO_PIN_HIGH].
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param PinNumber GPIO pin number to be written.
+ * @param PinState Specifies the desired pin state.
+ *                 - GPIO_PIN_LOW   : Reset the pin to 0
+ *                 - GPIO_PIN_HIGH  : Set the pin to 1
+ * 
+ * @return None
+ */
 void GPIO_WritePin(GPIO_RegDef_t *GPIOx, uint8_t PinNumber, GPIO_PinState_e PinState)
 {
     if(PinState == GPIO_PIN_LOW)
@@ -52,6 +72,15 @@ void GPIO_WritePin(GPIO_RegDef_t *GPIOx, uint8_t PinNumber, GPIO_PinState_e PinS
     }
 }
 
+/**
+ * @brief This function reads the state of the specified GPIO input pin
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param PinNumber GPIO pin number to be written.
+ * @return uint8_t Pin state
+ *                 - GPIO_PIN_LOW   : if the pin is low
+ *                 - GPIO_PIN_HIGH  : if the pin is high
+ */
 uint8_t GPIO_ReadPin(GPIO_RegDef_t *GPIOx, uint8_t PinNumber)
 {
     uint8_t ret;
@@ -60,11 +89,32 @@ uint8_t GPIO_ReadPin(GPIO_RegDef_t *GPIOx, uint8_t PinNumber)
     return ret;
 }
 
+/**
+ * @brief This function toggles the GPIO pin state.
+ *        The function toggles the pin state from HIGH to LOW or LOW to HIGH
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param PinNumber GPIO pin number to be written.
+ * 
+ * @return None 
+ */
 void GPIO_TogglePin(GPIO_RegDef_t *GPIOx, uint8_t PinNumber)
 {
     GPIOx->ODR ^= (0x01U << PinNumber);
 }
 
+/**
+ * @brief This function writes a high or low state to a specificed GPIO pin.
+ *        The operation can be done separately on an individual bit and not affects other bits.
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param PinNumber GPIO pin number to be written.
+ * @param PinState Specifies the desired pin state.
+ *                 - GPIO_PIN_LOW   : Reset the pin to 0
+ *                 - GPIO_PIN_HIGH  : Set the pin to 1
+ * 
+ * @return None
+ */
 void GPIO_WritePinBit(GPIO_RegDef_t *GPIOx, uint8_t PinNumber, GPIO_PinState_e PinState)
 {
     if(PinState == GPIO_PIN_LOW)
@@ -79,6 +129,14 @@ void GPIO_WritePinBit(GPIO_RegDef_t *GPIOx, uint8_t PinNumber, GPIO_PinState_e P
     }
 }
 
+/**
+ * @brief This functions locks the specified GPIO pin configuration.
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param PinNumber GPIO pin number to be written.
+ * 
+ * @return None
+ */
 void GPIO_LockPinConf(GPIO_RegDef_t *GPIOx, uint8_t PinNumber)
 {
     uint32_t temp1 = (0x01 << 16U);
