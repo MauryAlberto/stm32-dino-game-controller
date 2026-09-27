@@ -41,17 +41,8 @@ int main(void)
 
     while(1)
     {
-        /* When the button is pressed */
-        if(GPIO_ReadPin(GPIOA, GPIO_PIN_NUM_0) == GPIO_PIN_HIGH)
-        {
-            /* Delay for some ms */
-            SimDelay();
-            if(GPIO_ReadPin(GPIOA, GPIO_PIN_NUM_0) == GPIO_PIN_HIGH)
-            {
-                /* Toggle the blue LED */
-                GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
-            }
-        }
+        SimDelay();
+        GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
     }
 
     return 0;
