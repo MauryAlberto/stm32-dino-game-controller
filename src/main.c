@@ -5,7 +5,7 @@ GPIO_PinConf_t UserButton;
 
 void SimDelay(void) {
     uint32_t DelayCount;
-    for(DelayCount = 0; DelayCount < 200000; DelayCount++) {
+    for(DelayCount = 0; DelayCount < 50000; DelayCount++) {
         /* Do nothing */
     }
 }
@@ -27,9 +27,11 @@ void UserButton_Init(void)
     UserButton.PinNumber    = GPIO_PIN_NUM_0;
     UserButton.PinMode      = GPIO_MODE_INPUT;
     UserButton.PUPD         = GPIO_NO_PUPD;
+    UserButton.EdgeTrigger  = GPIO_IT_EDGE_RT;
 
     GPIOA_CLK_ENB();
     GPIO_Init(GPIOA, UserButton);
+    GPIO_IT_Init(GPIOA, UserButton, 1);
 }
 
 int main(void)
@@ -38,28 +40,27 @@ int main(void)
     BlueLED_Init();
     /* Initialize the button */
     UserButton_Init();
-    /* Lock the LED configuration */
-    GPIO_LockPinConf(GPIOD, GPIO_PIN_NUM_15);
 
-    /* Turn on the blue LED */
-    GPIO_WritePinBit(GPIOD, GPIO_PIN_NUM_15, GPIO_PIN_HIGH);
     while(1)
     {
-        /* Check the button state */
-        if(GPIO_ReadPin(GPIOA, GPIO_PIN_NUM_0) == GPIO_PIN_HIGH)
-        {
-            /* Delay for some ms */
-            SimDelay();
-            /* Check the button state */
-            if(GPIO_ReadPin(GPIOA, GPIO_PIN_NUM_0) == GPIO_PIN_HIGH)
-            {
-                /* Change the GPIOD pin number 15 mode from output to input mode */
-                Blinky_LED.PinMode = GPIO_MODE_INPUT;
-                /* Re-Init the GPIOD pin number 15 */
-                GPIO_Init(GPIOD, Blinky_LED);
-            }
-        }
+        /* Do nothing */
     }
 
     return 0;
+}
+
+void EXTI0_IRQHandler(void)
+{
+    /* Is the corresponding bit in the EXTI_PR register set? */
+    if((EXTI->PR >> UserButton.PinNumber) & 0x01U)
+    {
+        /* Clear the pending bit by writing 1 */
+        EXTI->PR |= (0x01U << UserButton.PinNumber);
+    }
+
+    SimDelay();
+    if(GPIO_ReadPin(GPIOA, GPIO_PIN_NUM_0) == GPIO_PIN_HIGH)
+    {
+        GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
+    }
 }

@@ -1,6 +1,7 @@
 #ifndef STM32F407XX_H
 #define STM32F407XX_H
 #include <stdint.h>
+#include "cortexM4.h"
 
 /* GPIO register definition struct */
 typedef struct
@@ -52,22 +53,78 @@ typedef struct
     volatile uint32_t PLLI2SCFGR;
 } RCC_RegDeg_t;
 
+/* SYSCFG register definition struct */
+typedef struct
+{
+    volatile uint32_t MEMRMP;
+    volatile uint32_t PMC;
+    volatile uint32_t EXTICR[4];
+    volatile uint32_t CMPCR;
+} SYSCFG_RegDef_t;
+
+/* EXTI register definition struct */
+typedef struct
+{
+    volatile uint32_t IMR;
+    volatile uint32_t EMR;
+    volatile uint32_t RTSR;
+    volatile uint32_t FTSR;
+    volatile uint32_t SWIER;
+    volatile uint32_t PR;
+} EXTI_RegDef_t;
+
+/* USART register definition struct */
+typedef struct 
+{
+    volatile uint32_t SR;
+    volatile uint32_t DR;
+    volatile uint32_t BRR;
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t CR3;
+    volatile uint32_t GTPR;
+} USART_Reg_Def_t;
+
+
 /* Peripheral base addresses */
+/* AHB1 base address */
 #define AHB1_BASEADDR   (0x40020000UL)
-#define GPIOA ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0000UL))
-#define GPIOB ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0400UL))
-#define GPIOC ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0800UL))
-#define GPIOD ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0C00UL))
-#define GPIOE ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0100UL))
-#define GPIOF ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0140UL))
-#define GPIOG ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0180UL))
-#define GPIOH ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x01C0UL))
-#define GPIOI ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0200UL))
-#define GPIOJ ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0240UL))
-#define GPIOK ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0280UL))
+
+/* APB1 base address */
+#define APB1_BASEADDR   (0x40000000UL)
+
+/* APB2 base address */
+#define APB2_BASEADDR   (0x40010000UL)
+
+/* GPIO base addresses */
+#define GPIOA ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0000UL))     /* GPIOA base address */
+#define GPIOB ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0400UL))     /* GPIOB base address */     
+#define GPIOC ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0800UL))     /* GPIOC base address */
+#define GPIOD ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0C00UL))     /* GPIOD base address */
+#define GPIOE ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0100UL))     /* GPIOE base address */
+#define GPIOF ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0140UL))     /* GPIOF base address */
+#define GPIOG ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0180UL))     /* GPIOG base address */
+#define GPIOH ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x01C0UL))     /* GPIOH base address */
+#define GPIOI ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0200UL))     /* GPIOI base address */
+#define GPIOJ ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0240UL))     /* GPIOJ base address */
+#define GPIOK ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0280UL))     /* GPIOK base address */
+
+/* USART/UART base addresses */
+#define USART1  ((USART_Reg_Def_t*) (APB2_BASEADDR + 0x1000UL)) /* USART1 base address */
+#define USART2  ((USART_Reg_Def_t*) (APB1_BASEADDR + 0x4400UL)) /* USART2 base address */
+#define USART3  ((USART_Reg_Def_t*) (APB1_BASEADDR + 0x4800UL)) /* USART3 base address */ 
+#define UART4   ((USART_Reg_Def_t*) (APB1_BASEADDR + 0x4C00UL)) /* UART4  base address */
+#define UART5   ((USART_Reg_Def_t*) (APB1_BASEADDR + 0x5000UL)) /* UART5  base address */
+#define USART6  ((USART_Reg_Def_t*) (APB2_BASEADDR + 0x1400UL)) /* USART6 base address */
 
 /* RCC base address */
 #define RCC   ((RCC_RegDeg_t *) (AHB1_BASEADDR + 0x3800UL))
+
+/* SYSCFG base address */
+#define SYSCFG ((SYSCFG_RegDef_t*) (APB2_BASEADDR + 0x3800UL))
+
+/* EXTI base address */
+#define EXTI ((EXTI_RegDef_t*) (APB2_BASEADDR + 0x3C00UL))
 
 /* GPIO clock enable */
 #define GPIOA_CLK_ENB()      (RCC->AHB1ENR |= 0x01U << 0U)  /* GPIOA peripheral clock enable */
@@ -80,6 +137,17 @@ typedef struct
 #define GPIOH_CLK_ENB()      (RCC->AHB1ENR |= 0x01U << 7U)  /* GPIOH peripheral clock enable */
 #define GPIOI_CLK_ENB()      (RCC->AHB1ENR |= 0x01U << 8U)  /* GPIOI peripheral clock enable */
 
+/* USART/UART clock enable */
+#define USART1_CLK_ENB()    (RCC->APB2ENR |= 0x01U << 4)    /* USART1 peripheral clock enable */
+#define USART2_CLK_ENB()    (RCC->APB1ENR |= 0x01U << 17)   /* USART2 peripheral clock enable */
+#define USART3_CLK_ENB()    (RCC->APB1ENR |= 0x01U << 18)   /* USART3 peripheral clock enable */
+#define UART4_CLK_ENB()     (RCC->APB1ENR |= 0x01U << 19)   /* UART4  peripheral clock enable */
+#define UART5_CLK_ENB()     (RCC->APB1ENR |= 0x01U << 20)   /* UART5  peripheral clock enable */
+#define USART6_CLK_ENB()    (RCC->APB2ENR |= 0x01U << 5)    /* USART6 peripheral clock enable */
+
+/* SYSCFG clock enable */
+#define SYSCFG_CLK_ENB()     (RCC->APB2ENR |= (0x01U << 14U)) /* SYSCFG peripheral clock enable */
+
 /* GPIO clock disable */
 #define GPIOA_CLK_DIS()      (RCC->AHB1ENR &= ~(0x01U << 0U))   /* GPIOA peripheral clock disable */ 
 #define GPIOB_CLK_DIS()      (RCC->AHB1ENR &= ~(0x01U << 1U))   /* GPIOB peripheral clock disable */
@@ -91,5 +159,23 @@ typedef struct
 #define GPIOH_CLK_DIS()      (RCC->AHB1ENR &= ~(0x01U << 7U))   /* GPIOH peripheral clock disable */
 #define GPIOI_CLK_DIS()      (RCC->AHB1ENR &= ~(0x01U << 8U))   /* GPIOI peripheral clock disable */
 
+/* USART/UART clock disable */
+#define USART1_CLK_DIS()    (RCC->APB2ENR &= ~(0x01U << 4))    /* USART1 peripheral clock disable */
+#define USART2_CLK_DIS()    (RCC->APB1ENR &= ~(0x01U << 17))   /* USART2 peripheral clock disable */
+#define USART3_CLK_DIS()    (RCC->APB1ENR &= ~(0x01U << 18))   /* USART3 peripheral clock disable */
+#define UART4_CLK_DIS()     (RCC->APB1ENR &= ~(0x01U << 19))   /* UART4  peripheral clock disable */
+#define UART5_CLK_DIS()     (RCC->APB1ENR &= ~(0x01U << 20))   /* UART5  peripheral clock disable */
+#define USART6_CLK_DIS()    (RCC->APB2ENR &= ~(0x01U << 5))    /* USART6 peripheral clock disable */
+
+/* SYSCFG clock disable */
+#define SYSCFG_CLK_DIS()     (RCC->APB2ENR &= ~(0x01U << 14U)) /* SYSCFG peripheral clock disable */
+
+/* Common used macros */
+#define DISABLE     0U
+#define ENABLE      1U
+#define BIT_RESET   0U
+#define BIT_SET     1U
+
 #include "stm32f407xx_gpio_driver.h"
+#include "stm32f407xx_usart_driver.h"
 #endif

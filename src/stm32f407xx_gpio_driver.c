@@ -152,3 +152,69 @@ void GPIO_LockPinConf(GPIO_RegDef_t *GPIOx, uint8_t PinNumber)
     /* RD LCKR */
     temp1 = GPIOx->LCKR;
 }
+
+/**
+ * @brief Initializes the interrupt for the specified GPIO pin
+ *        including EXTI settings and NVIC settings.
+ * 
+ * @param GPIOx Pointer to the GPIO port to be configured (e.g. GPIOA, GPIOB).
+ * @param GPIOPinConf Structure that contains the configuration information of a specified GPIO pin.
+ * @param Priority Interrupt priority of the selected pin
+ * 
+ * @return None
+ */
+void GPIO_IT_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf, uint8_t Priority)
+{
+    uint8_t index, bitpos, portcode;
+    /* Configure the SYSCFG */
+    /* Enable the clock for SYSCFG */
+    SYSCFG_CLK_ENB();
+    /* Select the source (GPIO pin) for the respective EXTI line */
+    /* Specify SYSCFG_EXTICR register index */
+    index = GPIOPinConf.PinNumber / 4;
+    /* Specify SYSCFG_EXTICR bit position */
+    bitpos = (GPIOPinConf.PinNumber % 4) * 4;
+    /* Specify GPIO port to be mapped in SYSCGF_EXTICR */
+    portcode = SYSCFG_EXTICR_PORTCODE(GPIOx);
+    SYSCFG->EXTICR[index] &= ~(0x0FU << bitpos);
+    SYSCFG->EXTICR[index] |= (portcode << bitpos);
+
+    /* Configure the EXTI */
+    /* Select the edge trigger for the interrupt */
+    switch (GPIOPinConf.EdgeTrigger)
+    {
+        case GPIO_IT_EDGE_FT:
+        {
+            /* Disable rising edge trigger selection */
+            EXTI->RTSR &= ~(0x01U << GPIOPinConf.PinNumber);
+            /* Enable the falling edge trigger selection */
+            EXTI->FTSR |= (0x01U << GPIOPinConf.PinNumber);
+            break;
+        }
+        case GPIO_IT_EDGE_RT:
+        {
+            /* Disable falling edge trigger selection */
+            EXTI->FTSR &= ~(0x01U << GPIOPinConf.PinNumber);
+            /* Enable the rising edge trigger selection */
+            EXTI->RTSR |= (0x01U << GPIOPinConf.PinNumber);
+            break;
+        }
+        default:
+        {
+            /* Enable falling edge trigger selection */
+            EXTI->FTSR |= ~(0x01U << GPIOPinConf.PinNumber);
+            /* Enable the rising edge trigger selection */
+            EXTI->RTSR |= (0x01U << GPIOPinConf.PinNumber);
+            break;
+        }
+    }
+
+    /* Enable the interrupt mask for the respective EXTI line */
+    EXTI->IMR |= (0x01U << GPIOPinConf.PinNumber);
+    
+    /* Configure the NVIC */
+    /* Set the interrupt priority */
+    NVIC_SetPriority(GPIO_PIN_TO_IQR(GPIOPinConf.PinNumber), Priority);
+    /* Enable the interrupt request*/
+    NVIC_EnableIRQ(GPIO_PIN_TO_IQR(GPIOPinConf.PinNumber));
+}
