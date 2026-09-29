@@ -21,7 +21,7 @@ void GPIO_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf)
         GPIOx->OTYPER &= ~(0x01U << GPIOPinConf.PinNumber);
         GPIOx->OTYPER |= (GPIOPinConf.OutType << GPIOPinConf.PinNumber);
         /* Configure the output speed */
-        GPIOx->OSPEEDR &= ~(0x02U << GPIOPinConf.PinNumber * 2);
+        GPIOx->OSPEEDR &= ~(0x03U << GPIOPinConf.PinNumber * 2);
         GPIOx->OSPEEDR |= (GPIOPinConf.OutSpeed << GPIOPinConf.PinNumber * 2);
     }
  
@@ -33,14 +33,14 @@ void GPIO_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf)
         if(GPIOPinConf.PinNumber < 8)
         {
             /* Configure for the alternate function low register */
-            GPIOx->AFRL &= ~(0x0FU << GPIOPinConf.PinNumber * 4);
+            GPIOx->AFRL &= ~(15 << GPIOPinConf.PinNumber * 4);
             GPIOx->AFRL |= (GPIOPinConf.AltFun << GPIOPinConf.PinNumber * 4);
         }
         else
         {
             /* Configure for the alternate function high register */
-            GPIOx->AFRH &= ~(0x0FU << GPIOPinConf.PinNumber * 4);
-            GPIOx->AFRH |= (GPIOPinConf.AltFun << GPIOPinConf.PinNumber * 4);
+            GPIOx->AFRH &= ~(15 << (GPIOPinConf.PinNumber - 8) * 4);
+            GPIOx->AFRH |= (GPIOPinConf.AltFun << (GPIOPinConf.PinNumber - 8) * 4);
         }
     }
 
@@ -176,7 +176,7 @@ void GPIO_IT_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf, uint8_t Prio
     bitpos = (GPIOPinConf.PinNumber % 4) * 4;
     /* Specify GPIO port to be mapped in SYSCGF_EXTICR */
     portcode = SYSCFG_EXTICR_PORTCODE(GPIOx);
-    SYSCFG->EXTICR[index] &= ~(0x0FU << bitpos);
+    SYSCFG->EXTICR[index] &= ~(15 << bitpos);
     SYSCFG->EXTICR[index] |= (portcode << bitpos);
 
     /* Configure the EXTI */
@@ -202,7 +202,7 @@ void GPIO_IT_Init(GPIO_RegDef_t *GPIOx, GPIO_PinConf_t GPIOPinConf, uint8_t Prio
         default:
         {
             /* Enable falling edge trigger selection */
-            EXTI->FTSR |= ~(0x01U << GPIOPinConf.PinNumber);
+            EXTI->FTSR |= (0x01U << GPIOPinConf.PinNumber);
             /* Enable the rising edge trigger selection */
             EXTI->RTSR |= (0x01U << GPIOPinConf.PinNumber);
             break;

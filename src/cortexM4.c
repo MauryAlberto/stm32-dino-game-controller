@@ -18,7 +18,7 @@ void NVIC_SetPriority(uint8_t IRQNumber, uint8_t Priority)
     /* Specify the bit position to start writing the priority */
     bitpos = (IRQNumber % 4U) * 8U;
     /* Set the priority */
-    NVIC->IPR[index] &= ~(Priority << (bitpos + 4U));
+    NVIC->IPR[index] &= ~(15 << (bitpos + 4U));
     NVIC->IPR[index] |= (Priority << (bitpos + 4U));
 }
 

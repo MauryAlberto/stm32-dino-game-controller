@@ -25,7 +25,8 @@ uint32_t RCC_GetPLLOutputClock(void)
 uint32_t RCC_GetPCLK1Val(void)
 {
     uint32_t P_Clk1, SYS_Clk;
-    uint8_t Clk_Src, temp, AHB_Pre, APB1_Pre;
+    uint16_t AHB_Pre;
+    uint8_t Clk_Src, temp, APB1_Pre;
 
     /* Clock source in the MCU */
     Clk_Src = (RCC->CFGR >> 2) & 0x03;
@@ -95,7 +96,8 @@ uint32_t RCC_GetPCLK1Val(void)
 uint32_t RCC_GetPCLK2Val(void)
 {
     uint32_t P_Clk2, SYS_Clk;
-    uint8_t Clk_Src, temp, AHB_Pre, APB2_Pre;
+    uint16_t AHB_Pre;
+    uint8_t Clk_Src, temp, APB2_Pre;
 
     /* Clock source in the MCU */
     Clk_Src = (RCC->CFGR >> 2) & 0x03;

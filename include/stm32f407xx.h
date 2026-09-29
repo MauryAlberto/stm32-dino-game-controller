@@ -101,13 +101,11 @@ typedef struct
 #define GPIOB ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0400UL))     /* GPIOB base address */     
 #define GPIOC ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0800UL))     /* GPIOC base address */
 #define GPIOD ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0C00UL))     /* GPIOD base address */
-#define GPIOE ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0100UL))     /* GPIOE base address */
-#define GPIOF ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0140UL))     /* GPIOF base address */
-#define GPIOG ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0180UL))     /* GPIOG base address */
-#define GPIOH ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x01C0UL))     /* GPIOH base address */
-#define GPIOI ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0200UL))     /* GPIOI base address */
-#define GPIOJ ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0240UL))     /* GPIOJ base address */
-#define GPIOK ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x0280UL))     /* GPIOK base address */
+#define GPIOE ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x1000UL))     /* GPIOE base address */
+#define GPIOF ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x1400UL))     /* GPIOF base address */
+#define GPIOG ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x1800UL))     /* GPIOG base address */
+#define GPIOH ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x1C00UL))     /* GPIOH base address */
+#define GPIOI ((GPIO_RegDef_t*) (AHB1_BASEADDR + 0x2000UL))     /* GPIOI base address */
 
 /* USART/UART base addresses */
 #define USART1  ((USART_Reg_Def_t*) (APB2_BASEADDR + 0x1000UL)) /* USART1 base address */
