@@ -85,6 +85,21 @@ typedef struct
     volatile uint32_t GTPR;
 } USART_Reg_Def_t;
 
+/* Timer register definition struct */
+typedef struct
+{
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+             uint32_t RESERVED0;
+    volatile uint32_t DIER;
+    volatile uint32_t SR;
+    volatile uint32_t EGR;
+             uint32_t RESERVERD1[3];
+    volatile uint32_t CNT;
+    volatile uint32_t PSC;
+    volatile uint32_t ARR;
+
+} TIM_RegDef_t;
 
 /* Peripheral base addresses */
 /* AHB1 base address */
@@ -115,6 +130,10 @@ typedef struct
 #define UART5   ((USART_Reg_Def_t*) (APB1_BASEADDR + 0x5000UL)) /* UART5  base address */
 #define USART6  ((USART_Reg_Def_t*) (APB2_BASEADDR + 0x1400UL)) /* USART6 base address */
 
+/* Timer peripheral base address */
+#define TIM6    ((TIM_RegDef_t*) (APB1_BASEADDR + 0x1000UL))    /* Timer 6 peripheral base address */
+#define TIM7    ((TIM_RegDef_t*) (APB1_BASEADDR + 0x1400UL))    /* Timer 7 peripheral base address */
+
 /* RCC base address */
 #define RCC   ((RCC_RegDeg_t *) (AHB1_BASEADDR + 0x3800UL))
 
@@ -143,6 +162,10 @@ typedef struct
 #define UART5_CLK_ENB()     (RCC->APB1ENR |= 0x01U << 20)   /* UART5  peripheral clock enable */
 #define USART6_CLK_ENB()    (RCC->APB2ENR |= 0x01U << 5)    /* USART6 peripheral clock enable */
 
+/* Timer peripheral clock enable */
+#define TIM6_CLK_ENB()      (RCC->APB1ENR |= (0x01U << 4U)) /* TIM6 peripheral clock enable */
+#define TIM7_CLK_ENB()      (RCC->APB1ENR |= (0x01U << 5U)) /* TIM7 peripheral clock enable */
+
 /* SYSCFG clock enable */
 #define SYSCFG_CLK_ENB()     (RCC->APB2ENR |= (0x01U << 14U)) /* SYSCFG peripheral clock enable */
 
@@ -165,6 +188,10 @@ typedef struct
 #define UART5_CLK_DIS()     (RCC->APB1ENR &= ~(0x01U << 20))   /* UART5  peripheral clock disable */
 #define USART6_CLK_DIS()    (RCC->APB2ENR &= ~(0x01U << 5))    /* USART6 peripheral clock disable */
 
+/* Timer peripheral clock enable */
+#define TIM6_CLK_DIS()      (RCC->APB1ENR |= (0x01U << 4U)) /* TIM6 peripheral clock disable */
+#define TIM7_CLK_DIS()      (RCC->APB1ENR |= (0x01U << 5U)) /* TIM7 peripheral clock disable */
+
 /* SYSCFG clock disable */
 #define SYSCFG_CLK_DIS()     (RCC->APB2ENR &= ~(0x01U << 14U)) /* SYSCFG peripheral clock disable */
 
@@ -178,4 +205,5 @@ typedef struct
 
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_usart_driver.h"
+#include "stm32f407xx_timer_driver.h"
 #endif

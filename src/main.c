@@ -4,6 +4,7 @@
 GPIO_PinConf_t Blinky_LED;
 GPIO_PinConf_t UserButton;
 USART_Conf_t USART3_Conf;
+TIM_Base_Conf_t TIM6_Conf;
 
 #define RX_BUFFER_SIZE  8U
 #define TX_BUFFER_SIZE  8U
@@ -75,11 +76,29 @@ void USART3_Init(void)
     USART_Init(USART3, USART3_Conf);
 }
 
+void TIM6_Init(void)
+{
+    TIM6_Conf.AutoReloadPreload = ENABLE;
+    TIM6_Conf.Period = 999;                 /* 1ms period */
+    TIM6_Conf.Prescaler = 15;               /* Counter clock is 1Mhz (with 16 Mhz timer clock) */
+    TIM6_CLK_ENB();
+    TIM_Base_Init(TIM6, TIM6_Conf);
+}
+
+void TIM6_Start(void)
+{
+    TIM_Base_Start(TIM6);
+}
+
 int main(void)
 {
+    uint16_t Timer6DelayCounter = 0U;
+
     BlueLED_Init();
     UserButton_Init();
     USART3_Init();
+    TIM6_Init();
+    TIM6_Start();
 
     while(1)
     {
@@ -123,6 +142,23 @@ int main(void)
 
                 /* Reset the index */
                 RxIndex = 0U;
+            }
+        }
+        
+        /* Check if update event generated */
+        if(TIM6_UEV_STS() == BIT_SET)
+        {
+            /* Clear the update event status */
+            TIM6_UEV_STS_CLR();
+            /* Increase the timer delay counter by 1 */
+            Timer6DelayCounter++;
+            /* Check if 1 second has elapsed */
+            if(Timer6DelayCounter == 1000)
+            {
+                /* Toggle the blue LED */
+                GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
+                /* Reset timer 6 delay counter */
+                Timer6DelayCounter = 0;
             }
         }
     }
