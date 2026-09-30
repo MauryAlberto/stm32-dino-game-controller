@@ -64,6 +64,7 @@ typedef struct
 /* USART_CR1 */
 #define USART_CR1_RE            2U      /* RE bit */
 #define USART_CR1_TE            3U      /* TE bit */
+#define USART_CR1_RXNEIE        5U      /* RXNEIE bit */
 #define USART_CR1_PS            9U      /* PS bit */
 #define USART_CR1_PCE           10U     /* PCE bit */
 #define USART_CR1_M             12U     /* M bit */
@@ -80,6 +81,10 @@ typedef struct
 /* USART_SR */
 #define USART_SR_TXE            7U      /* TXE bit  */
 #define USART_SR_RXNE           5U      /* RXNE bit */
+
+/* Interrupt configuration */
+#define USART3_RXNEIE_ENB()     (USART3->CR1 |= (1U << USART_CR1_RXNEIE));  /* Enable receive not empty interrupt  */
+#define USART3_RXNEIE_DIS()     (USART3->CR1 &= ~(1U << USART_CR1_RXNEIE)); /* Disable receive not empty interrupt */
 
 /* Function prototypes */
 void USART_Init(USART_Reg_Def_t* USARTx, USART_Conf_t USART_Conf);
