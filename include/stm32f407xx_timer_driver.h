@@ -28,12 +28,21 @@ typedef struct
 /* TIMx SR register bit */
 #define TIM_SR_UIF      0U  /* UIF: Update interrupt flag bit */
 
+/* TIMx DIER register bit */
+#define TIM_DIER_UIE    0U  /* UIE: Enable update interrupt bit */
+
 /* Macros handle update event status */
 #define TIM6_UEV_STS()          ((TIM6->SR >> TIM_SR_UIF) & 0x01U)      /* Timer 6 update event status */
 #define TIM6_UEV_STS_CLR()      (TIM6->SR &= ~(0x01U << TIM_SR_UIF))    /* Timer 7 clear update event status */
 
+/* Macro to map IRQn to TIMx */
+#define TIMx_TO_IRQ(TIMx)\
+        ((TIMx == TIM6) ? IRQ_NO_TIM6_DAC :\
+         (TIMx == TIM7) ? IRQ_NO_TIM7 : IRQ_NO_TIM6_DAC)
+
 void TIM_Base_Init(TIM_RegDef_t* TIMx, TIM_Base_Conf_t TIM_BaseConf);
 void TIM_Base_Start(TIM_RegDef_t* TIMx);
 void TIM_Base_Stop(TIM_RegDef_t* TIMx);
+void TIM_Base_IT_Init(TIM_RegDef_t* TIMx, uint8_t Priority);
 
 #endif

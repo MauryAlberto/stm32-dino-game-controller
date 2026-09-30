@@ -32,6 +32,8 @@ typedef struct
 #define IRQ_NO_EXTI9_5      23U
 #define IRQ_NO_USART3       39U
 #define IRQ_NO_EXTI15_10    40U
+#define IRQ_NO_TIM6_DAC     54U
+#define IRQ_NO_TIM7         55U
 
 #define NULL ((void*)0)
 

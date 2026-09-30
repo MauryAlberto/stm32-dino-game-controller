@@ -8,12 +8,14 @@ TIM_Base_Conf_t TIM6_Conf;
 
 #define RX_BUFFER_SIZE  8U
 #define TX_BUFFER_SIZE  8U
+#define BUTTON_DEBOUNCE_TIME    100U
 volatile uint8_t ReceivedMsg[RX_BUFFER_SIZE];
 volatile uint8_t SentMsg[RX_BUFFER_SIZE] = "J\n";
 volatile uint8_t TxMsgSize  = 2U;
 volatile uint8_t RxIndex    = 0U;
 volatile uint8_t RxData     = 0U;
-volatile uint8_t IsRxAvailable      = FALSE;
+volatile uint8_t IsRxAvailable = FALSE;
+volatile uint8_t Timer6DelayCounter = 0U;
 
 void SimDelay(void) {
     uint32_t DelayCount;
@@ -90,15 +92,24 @@ void TIM6_Start(void)
     TIM_Base_Start(TIM6);
 }
 
+void TIM6_Stop(void)
+{
+    TIM_Base_Stop(TIM6);
+}
+
+void TIM6_IT_Init(void)
+{
+    uint8_t Priority = 1U;
+    TIM_Base_IT_Init(TIM6, Priority);
+}
+
 int main(void)
 {
-    uint16_t Timer6DelayCounter = 0U;
-
     BlueLED_Init();
     UserButton_Init();
     USART3_Init();
     TIM6_Init();
-    TIM6_Start();
+    TIM6_IT_Init();
 
     while(1)
     {
@@ -145,38 +156,20 @@ int main(void)
             }
         }
         
-        /* Check if update event generated */
-        if(TIM6_UEV_STS() == BIT_SET)
-        {
-            /* Clear the update event status */
-            TIM6_UEV_STS_CLR();
-            /* Increase the timer delay counter by 1 */
-            Timer6DelayCounter++;
-            /* Check if 1 second has elapsed */
-            if(Timer6DelayCounter == 1000)
-            {
-                /* Toggle the blue LED */
-                GPIO_TogglePin(GPIOD, GPIO_PIN_NUM_15);
-                /* Reset timer 6 delay counter */
-                Timer6DelayCounter = 0;
-            }
-        }
     }
 
     return 0;
 }
 void EXTI0_IRQHandler(void)
 {
-    SimDelay();
+    /* Start timer 6 */
+    TIM6_Start();
     /* Is the corresponding bit in the EXTI_PR register set? */
     if((EXTI->PR >> UserButton.PinNumber) & 0x01U)
     {
         /* Clear the pending bit by writing 1 */
         EXTI->PR |= (0x01U << UserButton.PinNumber);
     }
-
-    /* Transmit data */
-    USART_Transmit(USART3, (uint8_t*)SentMsg, TxMsgSize);
 }
 
 void USART3_IRQHandler(void)
@@ -188,5 +181,27 @@ void USART3_IRQHandler(void)
         RxData = USART3->DR;
         /* Set the RX data available flag to TRUE */
         IsRxAvailable = TRUE;
+    }
+}
+
+void TIM6_DAC_IRQHandler(void)
+{
+    /* Check if update event generated */
+    if(TIM6_UEV_STS() == BIT_SET)
+    {
+        /* Clear the update event status */
+        TIM6_UEV_STS_CLR();
+        /* Increase the timer delay counter by 1 */
+        Timer6DelayCounter++;
+        /* Check if BUTTON_DEBOUNCE_TIME ms has elapsed */
+        if(Timer6DelayCounter == BUTTON_DEBOUNCE_TIME)
+        {
+            /* Toggle the blue LED */
+            USART_Transmit(USART3, (uint8_t*)SentMsg, TxMsgSize);
+            /* Reset timer 6 delay counter */
+            Timer6DelayCounter = 0;
+            /* Stop timer 6 */
+            TIM6_Stop();
+        }
     }
 }
