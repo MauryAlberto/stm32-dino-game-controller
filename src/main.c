@@ -1,10 +1,13 @@
 #include "stm32f407xx.h"
 #include <string.h>
+#include <stdlib.h>
 
 GPIO_PinConf_t Blinky_LED;
 GPIO_PinConf_t UserButton;
 USART_Conf_t USART3_Conf;
 TIM_Base_Conf_t TIM6_Conf;
+TIM_Base_Conf_t TIM4_Conf;
+TIM_OC_Conf_t TIM4_OC_Conf;
 
 #define RX_BUFFER_SIZE  8U
 #define TX_BUFFER_SIZE  8U
@@ -103,13 +106,47 @@ void TIM6_IT_Init(void)
     TIM_Base_IT_Init(TIM6, Priority);
 }
 
+void TIM4_OC_Init(void)
+{
+    GPIO_PinConf_t OC_Pin;
+
+    OC_Pin.PinMode      = GPIO_MODE_ALT;
+    OC_Pin.PUPD         = GPIO_NO_PUPD;
+    OC_Pin.OutType      = GPIO_OUTPUT_PP;
+    OC_Pin.OutSpeed     = GPIO_SPEED_VERY_HIGH;
+    OC_Pin.PinNumber    = GPIO_PIN_NUM_15;
+    OC_Pin.AltFun       = GPIO_ALT_AF2;
+    GPIOD_CLK_ENB();
+    GPIO_Init(GPIOD, OC_Pin);
+
+    TIM4_Conf.AutoReloadPreload = ENABLE;
+    TIM4_Conf.Period            = 999;
+    TIM4_Conf.Prescaler         = 15;
+    TIM4_Conf.CounterMode       = TIM_UPCOUNTING;
+    TIM4_CLK_ENB();
+    TIM_Base_Init(TIM4, TIM4_Conf);
+
+    TIM4_OC_Conf.OCMode     = TIM_OCMODE_PWM1;
+    TIM4_OC_Conf.OCPolarity = TIM_OCPOLARITY_HIGH;
+    TIM4_OC_Conf.Pulse      = 0;
+    TIM_OC_Init(TIM4, TIM4_OC_Conf, TIM_OC_CHANNEL_4);
+}
+
+void TIM4_Start(void)
+{
+    TIM_Base_Start(TIM4);
+}
+
 int main(void)
 {
+    uint8_t DutyCycle = 0;
     BlueLED_Init();
     UserButton_Init();
     USART3_Init();
     TIM6_Init();
     TIM6_IT_Init();
+    TIM4_OC_Init();
+    TIM4_Start();
 
     while(1)
     {
@@ -137,22 +174,11 @@ int main(void)
             {
                 /* Null-terminate the string/message */
                 ReceivedMsg[RxIndex - 1] = '\0';
-                /* Check if the received message is "ON" */
-                if(strcmp((const char*)ReceivedMsg, "ON") == 0)
-                {
-                    /* Turn blue LED ON */
-                    GPIO_WritePinBit(GPIOD, GPIO_PIN_NUM_15, GPIO_PIN_HIGH);
-                }
-
-                /* Check if the received message is "OFF" */
-                if(strcmp((const char*)ReceivedMsg, "OFF") == 0)
-                {
-                    /* Turn blue LED OFF */
-                    GPIO_WritePinBit(GPIOD, GPIO_PIN_NUM_15, GPIO_PIN_LOW);
-                }
-
+                DutyCycle = atoi((const char*) ReceivedMsg);
+                /* Set duty cycle for timer 4 pwm channel 4 */
+                TIM4_OC_PWM_SET_DUTY(TIM_OC_CHANNEL_4, (TIM4_Conf.Period * DutyCycle) / 100);
                 /* Reset the index */
-                RxIndex = 0U;
+                RxIndex = 0;
             }
         }
         
