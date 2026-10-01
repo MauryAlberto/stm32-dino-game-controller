@@ -186,6 +186,7 @@ int main(void)
 
     return 0;
 }
+
 void EXTI0_IRQHandler(void)
 {
     /* Start timer 6 */
